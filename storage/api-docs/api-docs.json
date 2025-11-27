@@ -1,0 +1,687 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Hotel API",
+        "description": "API para gestionar hoteles, habitaciones y reservas. Protegida por API Key (X-API-KEY).",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/hotels": {
+            "get": {
+                "tags": [
+                    "Hoteles"
+                ],
+                "summary": "Listar todos los hoteles",
+                "description": "Devuelve el listado completo de los hoteles",
+                "operationId": "1f059609a9a7cdebad01e8494549cc8d",
+                "responses": {
+                    "200": {
+                        "description": "Lista de hoteles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Hotel Central"
+                                            },
+                                            "city": {
+                                                "type": "string",
+                                                "example": "Buenos Aires"
+                                            },
+                                            "address": {
+                                                "type": "string",
+                                                "example": "Calle Falsa 123"
+                                            },
+                                            "phone": {
+                                                "type": "string",
+                                                "example": "+54 11 1234 5678"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "contacto@hotel.com"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Hoteles"
+                ],
+                "summary": "Crear un nuevo hotel",
+                "description": "Crea un nuevo hotel con los datos dados",
+                "operationId": "c8f412836761802038a38f7c95ad6c9e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Hotel Central"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Buenos Aires"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Calle Falsa 123"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+54 11 1234 5678"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "contacto@hotel.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Hotel creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Hotel Central"
+                                        },
+                                        "city": {
+                                            "type": "string",
+                                            "example": "Buenos Aires"
+                                        },
+                                        "address": {
+                                            "type": "string",
+                                            "example": "Calle Falsa 123"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "+54 11 1234 5678"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "contacto@hotel.com"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "property": null
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/reservations/{id}": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener una reserva en concreto dado su ID",
+                "description": "Devuelve los detalles de una reserva, incluyendo relación con la habitación y el hotel",
+                "operationId": "a226b43b2a6a846245e658d01bf00720",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la reserva",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reserva encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "room_id": {
+                                            "type": "integer"
+                                        },
+                                        "guest_name": {
+                                            "type": "string"
+                                        },
+                                        "guest_email": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "guest_count": {
+                                            "type": "integer",
+                                            "nullable": true
+                                        },
+                                        "check_in": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "check_out": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "room": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "hotel": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Reserva no encontrada"
+                    }
+                }
+            }
+        },
+        "/api/reservations": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Listar todas las reservas",
+                "description": "Devuelve un listado de reservas. Se pueden aplicar filtros: from, to, hotel_id, room_id",
+                "operationId": "fbc6050d9f7fdb07075d3aaeb157ffa9",
+                "parameters": [
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Fecha desde (exclusive) formato YYYY-MM-DD",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "Fecha hasta (exclusive) formato YYYY-MM-DD",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "hotel_id",
+                        "in": "query",
+                        "description": "Filtrar por ID de hotel",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "room_id",
+                        "in": "query",
+                        "description": "Filtrar por ID de habitación",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de reservas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "room_id": {
+                                                "type": "integer"
+                                            },
+                                            "guest_name": {
+                                                "type": "string"
+                                            },
+                                            "guest_email": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "guest_count": {
+                                                "type": "integer",
+                                                "nullable": true
+                                            },
+                                            "check_in": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "check_out": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Crear una nueva reserva",
+                "description": "Crea una nueva reserva si no hay solapamiento con reservas existentes",
+                "operationId": "01e3d21dc330a31de025203bc142ffa3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "room_id",
+                                    "guest_name",
+                                    "check_in",
+                                    "check_out"
+                                ],
+                                "properties": {
+                                    "room_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "guest_name": {
+                                        "type": "string",
+                                        "example": "Juan Pérez"
+                                    },
+                                    "guest_email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "marianela@mail.com"
+                                    },
+                                    "guest_count": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "check_in": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-12-01T14:00:00Z"
+                                    },
+                                    "check_out": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-12-05T11:00:00Z"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reserva creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "room_id": {
+                                            "type": "integer"
+                                        },
+                                        "guest_name": {
+                                            "type": "string"
+                                        },
+                                        "guest_email": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "guest_count": {
+                                            "type": "integer",
+                                            "nullable": true
+                                        },
+                                        "check_in": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "check_out": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflicto por solapamiento de reservas"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/api/hotels/{hotelId}/rooms": {
+            "get": {
+                "tags": [
+                    "Habitaciones"
+                ],
+                "summary": "Listar las habitaciones de un determinado hotel",
+                "description": "Devuelve el listado de habitaciones pertenecientes al hotel indicado",
+                "operationId": "442cf7acae7456f95967c56db11459c4",
+                "parameters": [
+                    {
+                        "name": "hotelId",
+                        "in": "path",
+                        "description": "ID del hotel",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de habitaciones",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Habitación Matrimonial"
+                                            },
+                                            "capacity": {
+                                                "type": "integer",
+                                                "example": 2,
+                                                "nullable": true
+                                            },
+                                            "room_type": {
+                                                "type": "string",
+                                                "example": "standard",
+                                                "nullable": true
+                                            },
+                                            "price": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 120.5,
+                                                "nullable": true
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Hotel no encontrado"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Habitaciones"
+                ],
+                "summary": "Crear una habitación de un hotel",
+                "description": "Crea una nueva habitación asociada al hotel indicado",
+                "operationId": "8bfc7a4e1654d05a797854e18881532f",
+                "parameters": [
+                    {
+                        "name": "hotelId",
+                        "in": "path",
+                        "description": "ID del hotel",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Habitación Matrimonial"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 2,
+                                        "nullable": true
+                                    },
+                                    "room_type": {
+                                        "type": "string",
+                                        "example": "suite",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 150,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Habitación creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Habitación Matrimonial"
+                                        },
+                                        "capacity": {
+                                            "type": "integer",
+                                            "example": 2,
+                                            "nullable": true
+                                        },
+                                        "room_type": {
+                                            "type": "string",
+                                            "example": "suite",
+                                            "nullable": true
+                                        },
+                                        "price": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 150,
+                                            "nullable": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Hotel no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "property": null
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "name": "X-API-KEY",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Reservas",
+            "description": "Operaciones relacionadas con reservas"
+        },
+        {
+            "name": "Habitaciones",
+            "description": "Operaciones relacionadas con habitaciones"
+        },
+        {
+            "name": "Hoteles",
+            "description": "Hoteles"
+        }
+    ]
+}
