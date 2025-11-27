@@ -665,6 +665,7 @@
         "securitySchemes": {
             "ApiKeyAuth": {
                 "type": "apiKey",
+                "description": "API Key needed to access the endpoints. Put the key in the X-API-KEY header.",
                 "name": "X-API-KEY",
                 "in": "header"
             }
@@ -682,6 +683,11 @@
         {
             "name": "Hoteles",
             "description": "Hoteles"
+        }
+    ],
+    "security": [
+        {
+            "ApiKeyAuth": []
         }
     ]
 }
