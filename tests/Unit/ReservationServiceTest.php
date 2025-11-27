@@ -33,7 +33,11 @@ class ReservationServiceTest extends PHPUnitTestCase
 
         $roomRepo->shouldReceive('findOrFail')->once()->with(11)->andReturn($room);
 
-        $reservationRepo->shouldReceive('existsOverlap')->once()->with(11, '2025-12-10', '2025-12-12')->andReturn(true);
+        // Las fechas ahora se normalizan con Carbon a 'Y-m-d H:i:s'
+        $reservationRepo->shouldReceive('existsOverlap')
+            ->once()
+            ->with(11, '2025-12-10 00:00:00', '2025-12-12 00:00:00')
+            ->andReturn(true);
 
         $service = new ReservationService($reservationRepo, $roomRepo);
 
@@ -62,7 +66,11 @@ class ReservationServiceTest extends PHPUnitTestCase
 
         $roomRepo->shouldReceive('findOrFail')->once()->with(11)->andReturn($room);
 
-        $reservationRepo->shouldReceive('existsOverlap')->once()->with(11, '2025-12-10', '2025-12-12')->andReturn(false);
+        // Esperamos que existsOverlap reciba las fechas ya formateadas 'Y-m-d H:i:s'
+        $reservationRepo->shouldReceive('existsOverlap')
+            ->once()
+            ->with(11, '2025-12-10 00:00:00', '2025-12-12 00:00:00')
+            ->andReturn(false);
 
         $reservationRepo->shouldReceive('create')->once()->with(Mockery::subset([
             'room_id' => 11, 'guest_name' => 'X'

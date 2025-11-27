@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\ReservationRepositoryInterface;
 use App\Repositories\RoomRepositoryInterface;
+use Carbon\Carbon;
 use RuntimeException;
 use InvalidArgumentException;
 
@@ -59,14 +60,31 @@ class ReservationService
 
         $room = $this->rooms->findOrFail((int)$data['room_id']);
 
-        $checkIn = $data['check_in'];
-        $checkOut = $data['check_out'];
+        // Normalizar/parsear fechas con Carbon y convertir al formato MySQL DATETIME
+        try {
+            $checkInDt = Carbon::parse($data['check_in']);
+            $checkOutDt = Carbon::parse($data['check_out']);
+        } catch (\Exception $e) {
+            // aunque validateData ya chequea, defensivamente lanzamos InvalidArgumentException
+            throw new InvalidArgumentException(json_encode([
+                'check_in' => ['El campo check_in no es una fecha válida.'],
+                'check_out' => ['El campo check_out no es una fecha válida.'],
+            ]));
+        }
 
-        $overlap = $this->reservations->existsOverlap($room->id, $checkIn, $checkOut);
+        // Usamos strings en formato 'Y-m-d H:i:s' para persistir y para el chequeo de solapamiento
+        $checkInStr = $checkInDt->format('Y-m-d H:i:s');
+        $checkOutStr = $checkOutDt->format('Y-m-d H:i:s');
+
+        $overlap = $this->reservations->existsOverlap($room->id, $checkInStr, $checkOutStr);
 
         if ($overlap) {
             throw new RuntimeException('overlap');
         }
+
+        // Reescribimos en $data las fechas normalizadas para que el repositorio las inserte correctamente
+        $data['check_in'] = $checkInStr;
+        $data['check_out'] = $checkOutStr;
 
         return $this->reservations->create($data);
     }
@@ -117,18 +135,30 @@ class ReservationService
             }
         }
 
-        $checkIn = isset($data['check_in']) ? strtotime((string)$data['check_in']) : false;
-        $checkOut = isset($data['check_out']) ? strtotime((string)$data['check_out']) : false;
+        // Validar check_in / check_out con Carbon (acepta ISO8601 con 'Z')
+        $checkInDt = null;
+        $checkOutDt = null;
 
-        if ($checkIn === false) {
-            $errors['check_in'][] = 'El campo check_in no es una fecha válida.';
-        }
-        if ($checkOut === false) {
-            $errors['check_out'][] = 'El campo check_out no es una fecha válida.';
+        if (isset($data['check_in'])) {
+            try {
+                $checkInDt = Carbon::parse((string)$data['check_in']);
+            } catch (\Exception $e) {
+                $errors['check_in'][] = 'El campo check_in no es una fecha válida.';
+            }
         }
 
-        if ($checkIn !== false && $checkOut !== false && $checkOut <= $checkIn) {
-            $errors['check_out'][] = 'El campo check_out debe ser una fecha posterior a check_in.';
+        if (isset($data['check_out'])) {
+            try {
+                $checkOutDt = Carbon::parse((string)$data['check_out']);
+            } catch (\Exception $e) {
+                $errors['check_out'][] = 'El campo check_out no es una fecha válida.';
+            }
+        }
+
+        if ($checkInDt instanceof Carbon && $checkOutDt instanceof Carbon) {
+            if ($checkOutDt->lte($checkInDt)) {
+                $errors['check_out'][] = 'El campo check_out debe ser una fecha posterior a check_in.';
+            }
         }
 
         if (!empty($errors)) {

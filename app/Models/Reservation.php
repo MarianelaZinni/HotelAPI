@@ -18,7 +18,10 @@ class Reservation extends Model
         'check_out',
     ];
 
-    protected $dates = ['check_in', 'check_out'];
+    protected $casts = [
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
+    ];
 
     public function room()
     {

@@ -7,7 +7,6 @@ use App\Http\Middleware\ApiKeyMiddleware;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,14 +20,17 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('api')->middleware([SubstituteBindings::class, ApiKeyMiddleware::class])->group(function () {
     // Hotels
     Route::get('/hotels', [HotelController::class, 'index']);
-    Route::post('/hotels', [HotelController::class, 'store']);
+    Route::post('/hotels', [HotelController::class, 'store'])
+        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
     // Rooms (per hotel)
     Route::get('/hotels/{hotelId}/rooms', [RoomController::class, 'index']);
-    Route::post('/hotels/{hotelId}/rooms', [RoomController::class, 'store']);
+    Route::post('/hotels/{hotelId}/rooms', [RoomController::class, 'store'])
+        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
     // Reservations
     Route::get('/reservations', [ReservationController::class, 'index']); // filtros: from, to, hotel_id, room_id
-    Route::post('/reservations', [ReservationController::class, 'store']);
+    Route::post('/reservations', [ReservationController::class, 'store'])
+        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
     Route::get('/reservations/{id}', [ReservationController::class, 'show']);
 });
