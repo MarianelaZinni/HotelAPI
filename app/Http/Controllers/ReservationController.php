@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\ReservationService;
-use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;

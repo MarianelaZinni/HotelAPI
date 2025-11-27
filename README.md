@@ -1,4 +1,4 @@
-# HotelAPI — README
+# API Administracion de reservas
 
 - Proyecto: API para la gestión de reservas de hoteles 
 - Stack utilizado: PHP 8.2.12 - Laravel 12
@@ -6,15 +6,16 @@
 - Autenticación en las rutas API: API Key enviada en el header `X-API-KEY`.
 - Documentación: Swagger (L5‑Swagger) en /api/documentation
 - Tests: PHPUnit
+- Repositorio: https://github.com/MarianelaZinni/HotelAPI
 
-Requisitos previos
+## Requisitos previos
 
 - Sistema operativo:  Windows
 - XAMPP (Apache + MySQL + PHP)
 - Composer (gestor de dependencias PHP)
 - Git
 
-Para levantar el entorno de forma manual:
+## Para levantar el entorno de forma manual:
 
 1) Clonar el repositorio: git clone https://github.com/MarianelaZinni/HotelAPI.git
 2) Acceder a la carpeta donde fue clonado: cd HotelAPI
@@ -55,6 +56,6 @@ http://127.0.0.1:8000/api/documentation
 		* Luego click en "Try it out" de las operaciones para que Swagger incluya la cabecera en las peticiones, completar/modificar los valores de ejemplo y ejecutar para
 		obtener la respuesta.
 		
-Notas y consideraciones de desarrollo: 
+## Notas y consideraciones de desarrollo: 
 - Las rutas API que reciben peticiones desde Swagger han sido exentas del chequeo CSRF mediante withoutMiddleware(VerifyCsrfToken::class) en las rutas POST correspondientes. Aun así, las rutas están protegidas por la API key.
 - El servicio de reservas normaliza fechas entrantes a formato MySQL 'Y-m-d H:i:s' usando Carbon antes de persistir.
