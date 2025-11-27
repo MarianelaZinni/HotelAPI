@@ -1,59 +1,60 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HotelAPI — README
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+- Proyecto: API para la gestión de reservas de hoteles 
+- Stack utilizado: PHP 8.2.12 - Laravel 12
+- Base de datos: MySQL
+- Autenticación en las rutas API: API Key enviada en el header `X-API-KEY`.
+- Documentación: Swagger (L5‑Swagger) en /api/documentation
+- Tests: PHPUnit
 
-## About Laravel
+Requisitos previos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Sistema operativo:  Windows
+- XAMPP (Apache + MySQL + PHP)
+- Composer (gestor de dependencias PHP)
+- Git
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Para levantar el entorno de forma manual:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1) Clonar el repositorio: git clone https://github.com/MarianelaZinni/HotelAPI.git
+2) Acceder a la carpeta donde fue clonado: cd HotelAPI
+3) Instalar dependencias PHP: composer install
+4) Copiar el contenido del archivo .env.example en .env (o renombrar) y editar los valores de:
+	- Conexion de base de datos:
+			DB_CONNECTION=mysql
+			DB_HOST=127.0.0.1
+			DB_PORT=3306
+			DB_DATABASE=hotelapi
+			DB_USERNAME=root
+			DB_PASSWORD=  #en xampp por defecto es vacio, por seguridad podes crear un password via phpMyAdmin o por consola para el usuario root y colocarlo aca
+			
+	- APP_NAME="HotelAPI"
+	- APP_KEY= app_key_de_prueba # para generar una nueva key se debe ejecutar: php artisan key:generate
+	- APP_URL=http://127.0.0.1:8000
+	- Configurar la API key que usa el middleware para autenticacion: 
+		API_KEY=api_key_de_prueba # podes generar una nueva 
+5) Iniciar XAMPP: arrancar Apache y MySQL desde el panel de XAMPP.
+6) Crear la base de datos en MySQL (via phpMyAdmin o por consola): Nombre sugerido: hotelapi, si se crea con otro nombre actualizar la variable DB_DATABASE en el archivo .env
+7) Levantar el servidor de desarrollo de Laravel: php artisan serve --host=127.0.0.1 --port=8000
+8) Ejecutar migraciones: php artisan migrate
 
-## Learning Laravel
+9) Para ejecutar los tests se debe correr el comando: php artisan test, este comando corre todos los tests, si se quieren ejecutar solo los tests unitarios se debe correr:
+php artisan test --testsuite=Unit
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+10) Para acceder a la documentacion mediante Swagger se debe abrir en el navegador: 
+http://127.0.0.1:8000/api/documentation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+11) Se usa el header: X-API-KEY y el valor es el que esta indicado en la variable API_KEY del archivo .env (api_key_de_prueba)
 
-## Laravel Sponsors
+12) Para probar los endpoints:
+	- Desde la consola se debe correr: curl.exe -i -H "X-API-KEY: api_key_de_prueba" "http://127.0.0.1:8000/api/reservations/1" -> En este ejemplo estamos intentando 
+		obtener la reserva con id = 1.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+	- Desde Swagger UI:
+		* Click en "Authorize" para poder pegar la API_KEY
+		* Luego click en "Try it out" de las operaciones para que Swagger incluya la cabecera en las peticiones, completar/modificar los valores de ejemplo y ejecutar para
+		obtener la respuesta.
+		
+Notas y consideraciones de desarrollo: 
+- Las rutas API que reciben peticiones desde Swagger han sido exentas del chequeo CSRF mediante withoutMiddleware(VerifyCsrfToken::class) en las rutas POST correspondientes. Aun así, las rutas están protegidas por la API key.
+- El servicio de reservas normaliza fechas entrantes a formato MySQL 'Y-m-d H:i:s' usando Carbon antes de persistir.
