@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reservation;
+use App\Services\ReservationService;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * @OA\Tag(
@@ -16,6 +18,13 @@ use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
+    protected $service;
+
+    public function __construct(ReservationService $service)
+    {
+        $this->service = $service;
+    }
+
    /**
      * Muestra los detalles de una reserva específica, dado su id
      *
@@ -63,7 +72,7 @@ class ReservationController extends Controller
      */
     public function show($id)
     {
-        $reservation = Reservation::with('room.hotel')->findOrFail($id);
+        $reservation = $this->service->show((int)$id);
         return response()->json($reservation);
     }
 
@@ -124,35 +133,8 @@ class ReservationController extends Controller
      */
     public function index(Request $request)
     {
-        $request->validate([
-            'from' => 'nullable|date',
-            'to' => 'nullable|date',
-            'hotel_id' => 'nullable|integer|exists:hotels,id',
-            'room_id' => 'nullable|integer|exists:rooms,id',
-        ]);
-
-        $query = Reservation::query()->with('room.hotel');
-
-        if ($request->filled('room_id')) {
-            $query->where('room_id', $request->room_id);
-        }
-
-        if ($request->filled('hotel_id')) {
-            $query->whereHas('room', function ($q) use ($request) {
-                $q->where('hotel_id', $request->hotel_id);
-            });
-        }
-
-        if ($request->filled('from')) {
-            $query->where('check_out', '>', $request->from);
-        }
-
-        if ($request->filled('to')) {
-            $query->where('check_in', '<', $request->to);
-        }
-
-        $bookings = $query->orderBy('check_in')->get();
-
+        $filters = $request->only(['from', 'to', 'hotel_id', 'room_id']);
+        $bookings = $this->service->index($filters);
         return response()->json($bookings);
     }
 
@@ -196,39 +178,29 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'room_id' => 'required|integer|exists:rooms,id',
-            'guest_name' => 'required|string',
-            'guest_email' => 'nullable|email',
-            'guest_count' => 'nullable|integer|min:1',
-            'check_in' => 'required|date',
-            'check_out' => 'required|date|after:check_in',
-        ]);
+          $data = $request->all();
 
-        $room = Room::findOrFail($data['room_id']);
+        try {
+            $reservation = $this->service->store($data);
 
-        // Convertir DateTime (la base de datos espera datetimes)
-        $checkIn = $data['check_in'];
-        $checkOut = $data['check_out'];
+            Log::info('Reserva creada: id=' . ($reservation->id ?? '') . ' room_id=' . ($reservation->room_id ?? ''));
 
-        // Comprobación de solapamiento:
-        // El solapamiento existe si: existing.check_in < new.check_out AND existing.check_out > new.check_in
-        $overlap = Reservation::where('room_id', $room->id)
-            ->where(function ($q) use ($checkIn, $checkOut) {
-                $q->where('check_in', '<', $checkOut)
-                  ->where('check_out', '>', $checkIn);
-            })->exists();
-
-        if ($overlap) {
-            $message = 'Reserva conflictiva para la habitación seleccionada en las fechas indicadas.';
-            Log::warning('Conflicto de reserva para room_id=' . $room->id . ' entre ' . $checkIn . ' y ' . $checkOut);
-            return response()->json(['message' => $message], 409);
+            return response()->json($reservation, 201);
+        } catch (InvalidArgumentException $e) {
+            // Errores de validación en el service
+            $errors = json_decode($e->getMessage(), true);
+            return response()->json([
+                'message' => 'La información proporcionada no es válida.',
+                'errors' => $errors ?: $e->getMessage()
+            ], 422);
+        } catch (RuntimeException $e) {
+            if ($e->getMessage() === 'overlap') {
+                $message = 'Reserva conflictiva para la habitación seleccionada en las fechas indicadas.';
+                Log::warning('Reserva conflictiva: ' . json_encode($data));
+                return response()->json(['message' => $message], 409);
+            }
+            // Re-lanzar otras RuntimeException
+            throw $e;
         }
-
-        $reservation = Reservation::create($data);
-
-        Log::info('Reserva creada: id=' . $reservation->id . ' room_id=' . $reservation->room_id);
-
-        return response()->json($reservation, 201);
     }
 }

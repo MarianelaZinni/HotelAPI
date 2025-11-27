@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Hotel;
 use Illuminate\Http\Request;
+use App\Services\RoomService;
+use InvalidArgumentException;
 
 /**
  * @OA\Tag(
@@ -13,6 +14,13 @@ use Illuminate\Http\Request;
  */
 class RoomController extends Controller
 {
+    protected $service;
+
+    public function __construct(RoomService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Muestra el listado de las habitaciones para un hotel específico.
      *
@@ -50,8 +58,8 @@ class RoomController extends Controller
      */
     public function index($hotelId)
     {
-        $hotel = Hotel::findOrFail($hotelId);
-        return response()->json($hotel->rooms()->get());
+        $rooms = $this->service->index((int) $hotelId);
+        return response()->json($rooms);
     }
 
     /**
@@ -111,17 +119,17 @@ class RoomController extends Controller
      */
     public function store(Request $request, $hotelId)
     {
-        $hotel = Hotel::findOrFail($hotelId);
+         $data = $request->all();
 
-        $data = $request->validate([
-            'name' => 'required|string',
-            'capacity' => 'nullable|integer|min:1',
-            'room_type' => 'nullable|string',
-            'price' => 'nullable|numeric|min:0'
-        ]);
-
-        $room = $hotel->rooms()->create($data);
-
-        return response()->json($room, 201);
+        try {
+            $room = $this->service->store((int)$hotelId, $data);
+            return response()->json($room, 201);
+        } catch (InvalidArgumentException $e) {
+            $errors = json_decode($e->getMessage(), true);
+            return response()->json([
+                'message' => 'La información proporcionada no es válida.',
+                'errors' => $errors ?: $e->getMessage()
+            ], 422);
+        }
     }
 }
