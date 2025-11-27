@@ -22,7 +22,7 @@ class ReservationServiceTest extends PHPUnitTestCase
     }
 
     /**
-     * Test que verifica que cuando existe solapamiento el servicio lanza RuntimeException('overlap').
+     * Test que verifica que cuando existe solapamiento el servicio lanza RuntimeException('solapamiento_reserva').
      */
     public function test_store_throws_on_overlap()
     {
@@ -42,7 +42,7 @@ class ReservationServiceTest extends PHPUnitTestCase
         $service = new ReservationService($reservationRepo, $roomRepo);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('overlap');
+        $this->expectExceptionMessage('solapamiento_reserva');
 
         $service->store([
             'room_id' => 11,

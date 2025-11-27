@@ -79,7 +79,7 @@ class ReservationService
         $overlap = $this->reservations->existsOverlap($room->id, $checkInStr, $checkOutStr);
 
         if ($overlap) {
-            throw new RuntimeException('overlap');
+            throw new RuntimeException('solapamiento_reserva');
         }
 
         // Reescribimos en $data las fechas normalizadas para que el repositorio las inserte correctamente

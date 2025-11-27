@@ -16,7 +16,7 @@ class ApiKeyMiddleware
 
         if (!$apiKey || !$headerKey || !hash_equals($apiKey, $headerKey)) {
             return response()->json([
-                'message' => 'Unauthorized. Invalid or missing API Key.'
+                'message' => 'Sin Autorización: Clave API inválida o ausente.'
             ], 401);
         }
 

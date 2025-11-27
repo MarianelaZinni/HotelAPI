@@ -64,7 +64,7 @@ class ReservationControllerTest extends TestCase
     }
 
     /**
-     * POST /api/reservations cuando hay solapamiento -> el servicio lanza RuntimeException('overlap')
+     * POST /api/reservations cuando hay solapamiento -> el servicio lanza RuntimeException('solapamiento_reserva')
      * y el controlador debe devolver 409 con el mensaje adecuado.
      */
     public function test_store_returns_409_on_overlap()
@@ -79,7 +79,7 @@ class ReservationControllerTest extends TestCase
         ];
 
         $serviceMock = Mockery::mock(ReservationService::class);
-        $serviceMock->shouldReceive('store')->once()->with(Mockery::subset($payload))->andThrow(new \RuntimeException('overlap'));
+        $serviceMock->shouldReceive('store')->once()->with(Mockery::subset($payload))->andThrow(new \RuntimeException('solapamiento_reserva'));
 
         $this->app->instance(ReservationService::class, $serviceMock);
 

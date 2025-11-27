@@ -193,7 +193,7 @@ class ReservationController extends Controller
                 'errors' => $errors ?: $e->getMessage()
             ], 422);
         } catch (RuntimeException $e) {
-            if ($e->getMessage() === 'overlap') {
+            if ($e->getMessage() === 'solapamiento_reserva') {
                 $message = 'Reserva conflictiva para la habitación seleccionada en las fechas indicadas.';
                 Log::warning('Reserva conflictiva: ' . json_encode($data));
                 return response()->json(['message' => $message], 409);
